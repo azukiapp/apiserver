@@ -27,16 +27,20 @@ module.exports = {
 
       var yamlBody = this.requestPayload.body;
       var payload = yaml.load(yamlBody);
-      
+
+      var default_vars = {
+        PATH: '/app/bin:/app/vendor/bundle/ruby/1.9.1/bin:/usr/local/bin:/usr/bin:/bin',
+        GEM_PATH: '/app/vendor/bundle/ruby/1.9.1:/app/vendor/bundle/ruby/2.0.0'
+      };
 
       this.requestPayload.addons = payload.addons;
-      this.requestPayload.envVars = payload.config_vars;
+      this.requestPayload.envVars = payload.config_vars || default_vars;
       this.requestPayload.pstable = payload.pstable;
       this.requestPayload.commit = payload.commit;
       this.requestPayload.slugId = payload.slug_id.toString();
-      
+
       cb();
-    }, 
+    },
     after: function(cb) {
       this.responsePayload = (this.responsePayload.rows[0].seq_count).toString();
       cb();
@@ -66,8 +70,8 @@ module.exports = {
 
           var job = dbResult.rows[0];
           if(job.distributed_to) {
-            result = { 
-              host: job.distributed_to, 
+            result = {
+              host: job.distributed_to,
               dyno_id: job.dyno_id,
               rez_id: job.rez_id
             };
@@ -138,7 +142,7 @@ module.exports = {
 
 
       cb();
-    } 
+    }
   },
 
   // Increment an app's heartbeat by 1

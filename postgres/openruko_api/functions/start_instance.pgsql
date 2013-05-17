@@ -12,6 +12,7 @@ DECLARE
   v_mounts hstore;
   v_bucket text;
   v_c text[];
+  v_path hstore;
 BEGIN
 
 
@@ -26,6 +27,7 @@ BEGIN
 
   v_bucket = '{{S3_BUCKET}}';
   v_release = get_current_release(v_instance.app_id);
+  v_path = '"PATH"=>"/app/bin:./bin:/usr/local/bin:/usr/local/sbin:/usr/sbin:/usr/bin:/sbin:/bin",' || v_release.env;
 
   v_dyno_id = generate_uuid();
 
@@ -45,7 +47,7 @@ BEGIN
       instance_id,
       command_args, logplex_id, mounts, created_at, next_action)
     VALUES 
-    ('dyno', v_instance.name, v_dyno_id, null, v_release.env,
+    ('dyno', v_instance.name, v_dyno_id, null, v_path,
       false, false, v_command, v_instance.id,
       v_command_args, v_instance.logplex_id, 
       v_mounts, NOW(), 'start');
